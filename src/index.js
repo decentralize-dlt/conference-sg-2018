@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 import chalk from 'chalk';
-import { TimeOutScraper, VisitSingaporeScraper, EventbriteScraper, SampleEventsScraper } from './scrapers/index.js';
+import { TimeOutScraper, VisitSingaporeScraper, EventbriteScraper, SampleEventsScraper, CURRENT_WEEKEND_EVENTS } from './scrapers/index.js';
 
 const SCRAPERS = {
   timeout: TimeOutScraper,
@@ -106,7 +106,8 @@ async function main() {
     .option('-f, --format <format>', 'Output format: console (default) or json', 'console')
     .option('-l, --limit <number>', 'Limit number of results', '50')
     .option('-o, --output <file>', 'Output file for JSON format')
-    .option('-d, --demo', 'Use curated list of Singapore events (reliable, no web scraping)')
+    .option('-d, --demo', 'Use curated list of Singapore attractions (generic, always available)')
+    .option('--live', 'Show current weekend events (updated weekly)')
     .parse();
 
   const options = program.opts();
@@ -117,14 +118,22 @@ async function main() {
 
   let events;
 
-  if (options.demo || options.source === 'curated') {
-    console.log(chalk.dim('Using curated list of Singapore events...\n'));
+  if (options.live) {
+    console.log(chalk.magenta.bold('🗓️  CURRENT WEEKEND EVENTS IN SINGAPORE\n'));
+    console.log(chalk.dim('Events sourced from TimeOut Singapore, Vogue SG, and other local guides.\n'));
+    events = CURRENT_WEEKEND_EVENTS;
+    if (options.category) {
+      const cat = options.category.toLowerCase();
+      events = events.filter(e => e.category.toLowerCase().includes(cat));
+    }
+  } else if (options.demo || options.source === 'curated') {
+    console.log(chalk.dim('Using curated list of Singapore attractions...\n'));
     const scraper = new SampleEventsScraper();
     events = await scraper.scrape({ category: options.category });
   } else {
     console.log(chalk.dim('Sources: TimeOut Singapore, Visit Singapore, Eventbrite'));
     console.log(chalk.dim('This may take a moment...\n'));
-    console.log(chalk.yellow('Tip: Use --demo flag for reliable curated events list\n'));
+    console.log(chalk.yellow('Tip: Use --live for current weekend events, --demo for attractions\n'));
     events = await runScrapers(options);
   }
   const limitedEvents = events.slice(0, parseInt(options.limit));

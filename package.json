@@ -1,0 +1,29 @@
+{
+  "name": "singapore-events-scraper",
+  "version": "1.0.0",
+  "description": "A web scraper bot that fetches interesting events and activities in Singapore",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "scrape": "node src/index.js",
+    "scrape:json": "node src/index.js --format json",
+    "scrape:timeout": "node src/index.js --source timeout",
+    "scrape:visitsg": "node src/index.js --source visitsg"
+  },
+  "keywords": [
+    "singapore",
+    "events",
+    "scraper",
+    "timeout",
+    "activities"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "commander": "^11.1.0",
+    "chalk": "^5.3.0"
+  }
+}
